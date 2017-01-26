@@ -51,11 +51,19 @@ class Gpio(object):
             self.start()
 
     def init_gpio(self):
-        GPIO.setmode(GPIO.BOARD)
+        GPIO.setmode(GPIO.BCM)
         logger.info("GPIO Channel: " + str(self.config['listening_pin']))
         GPIO.setup(self.config['listening_pin'],GPIO.OUT)
         GPIO.setup(self.config['thinking_pin'],GPIO.OUT)
         GPIO.setup(self.config['speaking_pin'],GPIO.OUT)
+        GPIO.output(self.config['listening_pin'],GPIO.HIGH)
+        GPIO.output(self.config['thinking_pin'],GPIO.HIGH)
+        GPIO.output(self.config['speaking_pin'],GPIO.HIGH)
+        sleep(1)
+        GPIO.output(self.config['listening_pin'],GPIO.LOW)
+        GPIO.output(self.config['thinking_pin'],GPIO.LOW)
+        GPIO.output(self.config['speaking_pin'],GPIO.LOW)
+
 
     def start(self, event=None):
         self.__register_events()
@@ -69,21 +77,21 @@ class Gpio(object):
 
     def handle_record_begin(self, event=None):
         logger.info("Set Record LED ON...")
-        GPIO.output(self.config.listening_gpio_pin,GPIO.HIGH)
+        GPIO.output(self.config['listening_pin'],GPIO.HIGH)
 
     def handle_record_end(self, event=None):
         logger.info("Set Record LED OFF...")
-        GPIO.output(self.config.listening_gpio_pin,GPIO.LOW)
-        GPIO.output(self.config.listening_gpio_pin,GPIO.LOW)
+        GPIO.output(self.config['listening_pin'],GPIO.LOW)
+        GPIO.output(self.config['thinking_pin'],GPIO.HIGH)
 
     def handle_audio_output_start(self, event=None):
         logger.info("Set Audio Output LED ON...")
-        GPIO.output(self.config.thinking_gpio_pin,GPIO.LOW)
-        GPIO.output(self.config.speaking_gpio_pin,GPIO.HIGH)
+        GPIO.output(self.config['thinking_pin'],GPIO.LOW)
+        GPIO.output(self.config['speaking_pin'],GPIO.HIGH)
 
     def handle_audio_output_end(self, event=None):
         logger.info("Set Audio Output LED OFF...")
-        GPIO.output(self.config.speaking_gpio_pin,GPIO.LOW)
+        GPIO.output(self.config['speaking_pin'],GPIO.LOW)
 
 
     def run(self):
