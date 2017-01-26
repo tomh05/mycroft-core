@@ -52,10 +52,10 @@ class Gpio(object):
 
     def init_gpio(self):
         GPIO.setmode(GPIO.BOARD)
-        logger.info("GPIO Channel: " + String(self.config.listening_channel))
-        GPIO.setup(self.config.listening_pin,GPIO.OUT)
-        GPIO.setup(self.config.thinking_pin,GPIO.OUT)
-        GPIO.setup(self.config.speaking_pin,GPIO.OUT)
+        logger.info("GPIO Channel: " + str(self.config['listening_pin']))
+        GPIO.setup(self.config['listening_pin'],GPIO.OUT)
+        GPIO.setup(self.config['thinking_pin'],GPIO.OUT)
+        GPIO.setup(self.config['speaking_pin'],GPIO.OUT)
 
     def start(self, event=None):
         self.__register_events()
