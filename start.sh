@@ -24,4 +24,6 @@ echo "Starting $@"
 shift
 
 source ${VIRTUALENV_ROOT}/bin/activate
-PYTHONPATH=${TOP} python ${SCRIPT} $@
+
+PYTHONPATH=${TOP}:/usr/lib/python2.7/dist-packages
+PYTHONPATH=$PYTHONPATH python ${SCRIPT} $@
