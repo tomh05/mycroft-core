@@ -22,7 +22,6 @@ from Queue import Queue
 from alsaaudio import Mixer
 from threading import Thread, Timer
 
-import serial
 
 from mycroft.client.teddy.eyes import TeddyEyes
 from mycroft.client.teddy.mouth import TeddyMouth
@@ -40,9 +39,9 @@ LOG = getLogger("TeddyClient")
 try:
    import RPi.GPIO as GPIO
 except RuntimeError:
-   logger.error("Got runtime error, make sure you are running in sudo mode?")
+   LOG.error("Got runtime error, make sure you are running in sudo mode?")
 except ImportError:
-   logger.error("Could not load Raspberry Pi's GPIO module. Do you have it installed?")
+   LOG.error("Could not load Raspberry Pi's GPIO module. Do you have it installed?")
 
 
 class TeddyWriter(Thread):
@@ -61,20 +60,19 @@ class TeddyWriter(Thread):
     Note: A command has to end with a line break
     """
 
-    def __init__(self, serial, ws, size=16):
+    def __init__(self, ws, size=16):
         super(TeddyWriter, self).__init__(target=self.flush)
         self.alive = True
         self.daemon = True
-        self.serial = serial
         self.ws = ws
         self.commands = Queue(size)
         self.init_stepper();
         self.start()
 
-    def init_stepper(self, pin1, pin2, pin3, pin4):
+    def init_stepper(self):
         GPIO.setmode(GPIO.BCM)
         self.steps=[[1,0,1,0],[0,1,1,0],[0,1,0,1],[1,0,0,1]]
-        for pin in self.config['pins']
+        for pin in self.config['pins']:
            GPIO.setup(pin,GPIO.OUT)
         self.calibrate_motor()
 
@@ -84,7 +82,7 @@ class TeddyWriter(Thread):
 
 
     def step(self,direction,delay):
-        if (direction == "clockwise")
+        if (direction == "clockwise"):
             for step_pins in steps:
                 self.set_step(step_pins)
                 time.sleep(delay)
@@ -94,7 +92,7 @@ class TeddyWriter(Thread):
                 time.sleep(delay)
 
 
-    def set_step(self,pins);
+    def set_step(self,pins):
         for pin in pins:
             GPIO.output(self.config['pins'][pin],pins[pin])
 
@@ -102,7 +100,9 @@ class TeddyWriter(Thread):
         while self.alive:
             try:
                 cmd = self.commands.get()
+                '''
                 self.serial.write(cmd + '\n')
+                '''
                 LOG.info("Writing: " + cmd)
                 self.commands.task_done()
             except Exception as e:
@@ -133,11 +133,9 @@ class Teddy(object):
         self.ws = WebsocketClient()
         ConfigurationManager.init(self.ws)
         self.config = ConfigurationManager.get().get("teddy")
-        self.__init_serial()
-        self.writer = TeddyWriter(self.serial, self.ws)
-        self.ws.on("teddy.start", self.start)
+        self.writer = TeddyWriter(self.ws)
         self.started = False
-        Timer(5, self.stop).start()     # WHY? This at least needs an explaination, this is non-obvious behavior
+        self.start()
 
     def start(self, event=None):
         self.eyes = TeddyEyes(self.ws, self.writer)
@@ -145,19 +143,6 @@ class Teddy(object):
         self.__register_events()
         self.__reset()
         self.started = True
-
-    def __init_serial(self):
-        try:
-            self.port = self.config.get("port")
-            self.rate = self.config.get("rate")
-            self.timeout = self.config.get("timeout")
-            self.serial = serial.serial_for_url(
-                url=self.port, baudrate=self.rate, timeout=self.timeout)
-            LOG.info("Connected to: %s rate: %s timeout: %s" %
-                     (self.port, self.rate, self.timeout))
-        except:
-            LOG.error("Impossible to connect to serial port: " + self.port)
-            raise
 
     def __register_events(self):
         self.ws.on('teddy.mouth.events.activate',
@@ -201,5 +186,4 @@ class Teddy(object):
     def stop(self):
         if not self.started:
             self.writer.stop()
-            self.serial.close()
             self.ws.close()

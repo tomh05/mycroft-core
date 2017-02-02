@@ -15,6 +15,7 @@ case $1 in
 	"audioaccuracytest") SCRIPT=${TOP}/audio-accuracy-test/audio_accuracy_test.py ;;
 	"sdkdoc") SCRIPT=${TOP}/doc/generate_sdk_docs.py ;;
     "enclosure") SCRIPT=${TOP}/mycroft/client/enclosure/main.py ;;
+    "teddy") SCRIPT=${TOP}/mycroft/client/teddy/main.py ;;
     "wifi") SCRIPT=${TOP}/mycroft/client/wifisetup/main.py ;;
 	*) echo "Usage: start.sh [service | skills | skill_container | voice | cli | audiotest | collector | unittest | enclosure | sdkdoc | wifi]"; exit ;;
 esac
