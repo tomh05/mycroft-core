@@ -60,9 +60,10 @@ class TeddyWriter(Thread):
     Note: A command has to end with a line break
     """
 
-    def __init__(self, ws, size=16):
+    def __init__(self, config, ws, size=16):
         super(TeddyWriter, self).__init__(target=self.flush)
         self.alive = True
+        self.config = config
         self.daemon = True
         self.ws = ws
         self.commands = Queue(size)
@@ -133,7 +134,7 @@ class Teddy(object):
         self.ws = WebsocketClient()
         ConfigurationManager.init(self.ws)
         self.config = ConfigurationManager.get().get("teddy")
-        self.writer = TeddyWriter(self.ws)
+        self.writer = TeddyWriter(self.config,self.ws)
         self.started = False
         self.start()
 
