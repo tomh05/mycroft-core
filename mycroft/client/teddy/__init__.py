@@ -79,22 +79,22 @@ class TeddyWriter(Thread):
 
     def calibrate_motor(self):
         for i in range(100):
-           step("clockwise",10)
+           step("clockwise",5)
 
 
     def step(self,direction,delay):
         if (direction == "clockwise"):
-            for step_pins in steps:
+            for step_pins in self.steps:
                 self.set_step(step_pins)
-                time.sleep(delay)
+                time.sleep(delay/1000.0)
         else:
             for step_pins in reversed(steps):
                 self.set_step(step_pins)
-                time.sleep(delay)
+                time.sleep(delay/1000.0)
 
 
     def set_step(self,pins):
-        for pin in pins:
+        for pin in range(4):
             GPIO.output(self.config['pins'][pin],pins[pin])
 
     def flush(self):
